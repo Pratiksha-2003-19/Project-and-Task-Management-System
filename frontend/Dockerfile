@@ -1,14 +1,13 @@
-# Use Node.js official image
-FROM node:18-alpine AS build
+# Build stage
+FROM node:18-alpine AS builder
 
-# Set working directory
 WORKDIR /app
 
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install dependencies (use npm install instead of npm ci)
+RUN npm install
 
 # Copy source code
 COPY . .
@@ -16,17 +15,29 @@ COPY . .
 # Build the app
 RUN npm run build
 
-# Use nginx to serve the built app
+# Production stage
 FROM nginx:alpine
 
-# Copy built files from build stage to nginx
-COPY --from=build /app/build /usr/share/nginx/html
+# Copy built files from builder stage
+COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy nginx configuration (optional)
-# COPY nginx.conf /etc/nginx/nginx.conf
+# Create nginx configuration with Railway port
+RUN echo 'server { \
+    listen 8080; \
+    server_name localhost; \
+    location / { \
+        root /usr/share/nginx/html; \
+        index index.html; \
+        try_files $uri $uri/ /index.html; \
+    } \
+    location /api { \
+        proxy_pass https://project-and-task-management-system-production.up.railway.app; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; \
+    } \
+}' > /etc/nginx/conf.d/default.conf
 
-# Expose port 80
-EXPOSE 80
+EXPOSE 8080
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
