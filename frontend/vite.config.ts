@@ -8,12 +8,16 @@ export default defineConfig({
   base: "/", // ✅ IMPORTANT for deployment
 
   server: {
-    port: 5173,
+    port: 3000,
     proxy: {
       '/api': {
         target: 'http://localhost:8081', // only for local dev
         changeOrigin: true,
       }
     }
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: true,
   }
 })
