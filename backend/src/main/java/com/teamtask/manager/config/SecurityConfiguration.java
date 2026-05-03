@@ -34,7 +34,12 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         // 🔓 ADDED /health and / to public endpoints
-                        .requestMatchers("/", "/health", "/api/v1/auth/**", "/h2-console/**").permitAll()
+                        .requestMatchers(
+    "/",
+    "/health",
+    "/api/v1/auth/**",
+    "/api/v1/users/**"
+).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
