@@ -1,10 +1,20 @@
-import { Bell, Search, User, LogOut } from 'lucide-react'; // Added LogOut
+import { Bell, Search, User, LogOut } from 'lucide-react';
+import { NavLink } from "react-router-dom";
 import { useState } from 'react';
+
+// ✅ Define proper user type
+type UserType = {
+  name: string;
+  role: string;
+  email?: string; // optional
+};
 
 const Navbar = () => {
   const [showUserMenu, setShowUserMenu] = useState(false);
 
-  let user = { name: 'User', role: 'MEMBER' };
+  // ✅ Initialize user with type
+  let user: UserType = { name: 'User', role: 'MEMBER' };
+
   try {
     const savedUser = localStorage.getItem('user');
     if (savedUser) user = JSON.parse(savedUser);
@@ -26,6 +36,8 @@ const Navbar = () => {
       padding: '10px 0 30px 0',
       marginBottom: '20px'
     }}>
+      
+      {/* Search Bar */}
       <div className="search-bar" style={{ position: 'relative', width: '400px' }}>
         <Search size={18} color="var(--text-muted)" style={{ position: 'absolute', left: '12px', top: '12px' }} />
         <input
@@ -35,11 +47,15 @@ const Navbar = () => {
         />
       </div>
 
+      {/* Right Section */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+        
+        {/* Notification */}
         <button style={{ background: 'var(--bg-card)', padding: '10px', color: 'var(--text-muted)', cursor: 'pointer' }}>
           <Bell size={20} />
         </button>
 
+        {/* User Section */}
         <div style={{ position: 'relative' }}>
           <div
             onClick={() => setShowUserMenu(!showUserMenu)}
@@ -49,6 +65,7 @@ const Navbar = () => {
               <p style={{ fontWeight: '600', fontSize: '0.9rem' }}>{user.name}</p>
               <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.role}</p>
             </div>
+
             <div style={{
               width: '40px',
               height: '40px',
@@ -62,7 +79,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* User Dropdown Menu - No Settings option */}
+          {/* Dropdown */}
           {showUserMenu && (
             <div style={{
               position: 'absolute',
@@ -76,11 +93,16 @@ const Navbar = () => {
               zIndex: 1000,
               overflow: 'hidden'
             }}>
+              
+              {/* User Info */}
               <div style={{ padding: '12px', borderBottom: '1px solid var(--border)' }}>
                 <p style={{ fontWeight: '600' }}>{user.name}</p>
-                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{user.email || user.role}</p>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  {user.email || user.role}
+                </p>
               </div>
-              {/* Profile link only - NO Settings */}
+
+              {/* Profile Link */}
               <NavLink
                 to="/profile"
                 style={{
@@ -95,6 +117,8 @@ const Navbar = () => {
               >
                 Profile
               </NavLink>
+
+              {/* Logout */}
               <button
                 onClick={handleLogout}
                 style={{
@@ -110,7 +134,10 @@ const Navbar = () => {
                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(239, 68, 68, 0.1)'}
                 onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
-                Logout
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <LogOut size={16} />
+                  Logout
+                </div>
               </button>
             </div>
           )}
